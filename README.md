@@ -23,3 +23,7 @@ Create a Java Card applet using JavaCard 3.1.0+ API for the following requiremen
 5. In Eclipse, go to Java Card > Preferences > Java Card Home and set it to the path you installed java_card_kit-2_2_2 at 
 6. In Eclipse, go to File > New > Other and select Java Card Project
 7. Happy coding!
+
+## Additional references
+- [Setup tutorial](https://scc.rhul.ac.uk/files/2016/10/Eclipse.pdf)
+- [Comprehensive Java Card Tutorial](http://javacard.vetilles.com/tutorial/)

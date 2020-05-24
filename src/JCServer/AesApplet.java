@@ -32,41 +32,45 @@ public class AesApplet extends Applet {
 
     public void process(APDU apdu){ 
          byte[] buf = apdu.getBuffer();
-         if (selectingApplet())
-         {
+         if (selectingApplet()){
               return;
          }
-         if (buf[ISO7816.OFFSET_CLA] != 0) ISOException.throwIt(ISO7816.SW_CLA_NOT_SUPPORTED);
+         if (buf[ISO7816.OFFSET_CLA] != 0) {
+        	 ISOException.throwIt(ISO7816.SW_CLA_NOT_SUPPORTED);
+         }
          
-         if (buf[ISO7816.OFFSET_INS] != (byte) (0xAA)) ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
+         if (buf[ISO7816.OFFSET_INS] != (byte) (0xAA)) {
+        	 ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
+         }
          
-         switch (buf[ISO7816.OFFSET_P1])
-         {
-         case (byte) 0x01:
-              doAES(apdu);
-              return;
-         default:
-              ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
+         switch (buf[ISO7816.OFFSET_P1]){
+	         case (byte) 0x01:
+	              doAES(apdu);
+	              return;
+	         default:
+	              ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
          }
     }
 
     private void doAES(APDU apdu){
          
-         byte b[] = apdu.getBuffer();
+         byte buffer[] = apdu.getBuffer();
          
          short incomingLength = (short) (apdu.setIncomingAndReceive());
-         if (incomingLength != 24) ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+         if (incomingLength != 24) {
+        	 ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+         }
 
          //perform encryption and append results in APDU Buffer a[] automatically 
          
          aesCipher.init(aesKey, Cipher.MODE_ENCRYPT);
-         aesCipher.doFinal(b, (short) dataOffset, incomingLength, a, (short) (dataOffset + 24));
+         aesCipher.doFinal(buffer, (short) dataOffset, incomingLength, a, (short) (dataOffset + 24));
          aesCipher.init(aesKey, Cipher.MODE_DECRYPT);
-         aesCipher.doFinal(b, (short) (dataOffset + 24), incomingLength, a, (short) (dataOffset + 48));
+         aesCipher.doFinal(buffer, (short) (dataOffset + 24), incomingLength, a, (short) (dataOffset + 48));
 
          // Send results
          apdu.setOutgoing();
          apdu.setOutgoingLength((short) 72);
-         apdu.sendBytesLong(b, (short) dataOffset, (short) 72);
+         apdu.sendBytesLong(buffer, (short) dataOffset, (short) 72);
     }
 }

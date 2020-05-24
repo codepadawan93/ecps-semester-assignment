@@ -1,3 +1,0 @@
-INDEX VERSION 1.121+C:\Users\erik\JavaCardsWorkspace\.metadata\.plugins\org.eclipse.jdt.core
-1164159824.index
-2967916976.index

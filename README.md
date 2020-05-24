@@ -5,9 +5,9 @@
 Create a Java Card applet using JavaCard 3.1.0+ API for the following requirements (maximum 10 out of 10):
 
 - [ ] Encrypt and Decrypt a file (PDF, Word or another format) with AES algorithm.
-- [ ] The Java Card application exchanges message and is selected by a host stand-alone application (C/C++/Java), or a browser plugin.
-- [ ] The source code for the Java card applet and for the host application must be provided.
-- [ ] Also the files with the compilation phases and the test statements in batch must be provided.
+- [x] The Java Card application exchanges message and is selected by a host stand-alone application (C/C++/Java), or a browser plugin.
+- [x] The source code for the Java card applet and for the host application must be provided.
+- [x] Also the files with the compilation phases and the test statements in batch must be provided.
 
 ## Configuration
 ### Prerequisites:
@@ -24,7 +24,13 @@ Create a Java Card applet using JavaCard 3.1.0+ API for the following requiremen
 6. In Eclipse, go to File > New > Other and select Java Card Project
 7. Happy coding!
 
-### APDU structure
+## How to run
+TODO
+
+## Project Structure
+TODO
+
+## APDU structure
 <table class="wikitable">
    <tbody>
       <tr>

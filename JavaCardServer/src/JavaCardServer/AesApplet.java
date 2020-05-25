@@ -9,19 +9,13 @@ import javacardx.crypto.*;
 
 public class AesApplet extends Applet {
 	//globals
-    AESKey aesKey;
-    Cipher aesCipher;
-    RandomData random;
-    static byte a[];
-    final short dataOffset = (short) ISO7816.OFFSET_CDATA;
+    private AESKey aesKey;
+    private Cipher aesCipher;
+    private byte acc[];
+    private short dataOffset;
 
     //constructor
     private AesApplet (byte bArray[], short bOffset, byte bLength){
-         aesKey = (AESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_AES, KeyBuilder.LENGTH_AES_128, false);
-         aesCipher = Cipher.getInstance(Cipher.ALG_AES_BLOCK_128_CBC_NOPAD, false);
-         a = new byte[ (short) 128];
-         random.generateData(a, (short)0, (short)128);
-         aesKey.setKey(a, (short) 0);
          register(bArray, (short) (bOffset + 1), bArray[bOffset]);
     }
 
@@ -30,42 +24,51 @@ public class AesApplet extends Applet {
          new AesApplet (bArray, bOffset, bLength);
     }
 
-    public void process(APDU apdu){ 
-         byte[] buf = apdu.getBuffer();
-         if (selectingApplet()){
-              return;
-         }
-         if (buf[ISO7816.OFFSET_CLA] != 0) {
-        	 ISOException.throwIt(ISO7816.SW_CLA_NOT_SUPPORTED);
-         }
-         
-         if (buf[ISO7816.OFFSET_INS] != (byte) (0xAA)) {
-        	 ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
-         }
-         
-         switch (buf[ISO7816.OFFSET_P1]){
-         	 // Encrypt or decrypt the message
-	         case (byte) 0x01:
-	              doAES(apdu, Cipher.MODE_ENCRYPT);
-	              return;
+    public void process(APDU apdu){
+    	byte[] buf = apdu.getBuffer();
+	    if (selectingApplet()){
+	    	return;
+	    }
+	    dataOffset = apdu.getOffsetCdata();
+    	aesKey = (AESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_AES, KeyBuilder.LENGTH_AES_128, false);
+        aesCipher = Cipher.getInstance(Cipher.ALG_AES_BLOCK_128_CBC_NOPAD, false);
+        acc = new byte[16];
+        for(short i = 0; i < 16; i++){
+        	acc[i] = buf[(short)(i + dataOffset)];
+        }
+        aesKey.setKey(acc, (short) 0);
+	    if (buf[ISO7816.OFFSET_CLA] != 0x00) {
+	    	ISOException.throwIt(ISO7816.SW_CLA_NOT_SUPPORTED);
+	    }
+	    if (buf[ISO7816.OFFSET_INS] != (byte) (0xaa)) {
+	    	ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
+	    }
+	     
+	    switch (buf[ISO7816.OFFSET_P1]){
+	        // Encrypt or decrypt the message
+	    	case (byte) 0x01:
+	            doAES(apdu, Cipher.MODE_ENCRYPT);
+	    		ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
+	            return;
 	         case (byte) 0x02:
-	              doAES(apdu, Cipher.MODE_DECRYPT);
-	              return;
+	        	ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
+	            doAES(apdu, Cipher.MODE_DECRYPT);
+	            return;
 	         default:
-	              ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
-         }
+	            ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
+	    }
     }
 
     private void doAES(APDU apdu, byte mode){
     	// TODO:: debug this
-         byte buffer[] = apdu.getBuffer();
-         short incomingLength = (short) (apdu.setIncomingAndReceive());
+        byte buffer[] = apdu.getBuffer();
+        short incomingLength = (short) (apdu.setIncomingAndReceive());
+        
+    	aesCipher.init(aesKey, mode);
+    	aesCipher.doFinal(buffer, (short) dataOffset, incomingLength, acc, (short) (dataOffset + incomingLength));
          
-    	 aesCipher.init(aesKey, mode);
-    	 aesCipher.doFinal(buffer, (short) dataOffset, incomingLength, a, (short) (dataOffset + incomingLength));
-         
-         apdu.setOutgoing();
-         apdu.setOutgoingLength((short) buffer.length);
-         apdu.sendBytesLong(buffer, (short) dataOffset, (short)buffer.length);
+        apdu.setOutgoing();
+        apdu.setOutgoingLength((short) buffer.length);
+        apdu.sendBytesLong(buffer, (short) dataOffset, (short)buffer.length);
     }
 }

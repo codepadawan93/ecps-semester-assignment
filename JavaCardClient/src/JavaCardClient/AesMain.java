@@ -5,17 +5,17 @@ import java.net.UnknownHostException;
 import JavaCardClient.AesClient;
 
 public class AesMain {
-
+	
 	public static void main(String[] args) {
 		// Data will be sent to localhost:9025
 		AesClient client = null;
 		try {
+			// TODO:: Also read the response. For some reason it crashes
 			client = new AesClient("127.0.0.1", 9025);
 			client.sendPowerUp();
 			client.sendSelectAesApplet();
-			byte[] res = client.receive(10);
+			client.sendInstall();
 			int len = client.sendFile("./TestData/testfile.txt");
-			// res = client.receive(len);
 			client.sendPowerDown();
 		} catch(UnknownHostException uhe){
 			uhe.printStackTrace();

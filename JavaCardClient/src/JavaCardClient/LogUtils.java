@@ -17,7 +17,7 @@ public class LogUtils {
 	public static String byteArrayToHexStr(byte[] arr){
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < arr.length; i++){
-			sb.append(String.format("%02x", arr[i]));
+			sb.append(String.format("%02x ", arr[i]));
 		}
 		return sb.toString();
 	}

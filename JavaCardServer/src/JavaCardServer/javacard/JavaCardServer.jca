@@ -1,5 +1,5 @@
 // converted by version 1.3
-// on Sun May 24 17:53:31 EEST 2020
+// on Tue May 26 00:32:50 EEST 2020
 
 .package JavaCardServer {
 	.aid 0x1:0x2:0x3:0x4:0x5:0x6:0x7:0x8:0x9:0x0;
@@ -24,63 +24,60 @@
 		// 2
 		instanceFieldRef 2.1 AesApplet/aesCipher;
 		// 3
-		instanceFieldRef 1.14 AesApplet/random;
+		instanceFieldRef byte[] AesApplet/acc;
 		// 4
-		staticMethodRef 0.3.0()V;		// javacard/framework/Applet.<init>()V
+		virtualMethodRef 0.10.1()[B;		// getBuffer()[B
 		// 5
-		staticMethodRef 2.1.0(BZ)Ljavacardx/crypto/Cipher;;		// javacardx/crypto/Cipher.getInstance(BZ)Ljavacardx/crypto/Cipher;
-			.descriptor	Ljavacardx/crypto/Cipher;	2.1;
-
+		virtualMethodRef 0.3.3()Z;		// selectingApplet()Z
 		// 6
+		virtualMethodRef 0.10.16()S;		// getOffsetCdata()S
+		// 7
+		staticMethodRef 0.3.0()V;		// javacard/framework/Applet.<init>()V
+		// 8
 		staticMethodRef 1.13.0(BSZ)Ljavacard/security/Key;;		// javacard/security/KeyBuilder.buildKey(BSZ)Ljavacard/security/Key;
 			.descriptor	Ljavacard/security/Key;	1.0;
 
-		// 7
-		staticFieldRef byte[] AesApplet/a;
-		// 8
-		classRef 1.20;		// javacard/security/AESKey
 		// 9
-		virtualMethodRef 1.14.1([BSS)V;		// generateData([BSS)V
+		classRef 1.20;		// javacard/security/AESKey
 		// 10
 		virtualMethodRef 0.3.2([BSB)V;		// register([BSB)V
 		// 11
-		classRef AesApplet;
+		staticMethodRef 2.1.0(BZ)Ljavacardx/crypto/Cipher;;		// javacardx/crypto/Cipher.getInstance(BZ)Ljavacardx/crypto/Cipher;
+			.descriptor	Ljavacardx/crypto/Cipher;	2.1;
+
 		// 12
-		staticMethodRef AesApplet/<init>([BSB)V;
+		classRef AesApplet;
 		// 13
-		virtualMethodRef 0.10.1()[B;		// getBuffer()[B
+		staticMethodRef AesApplet/<init>([BSB)V;
 		// 14
-		virtualMethodRef 0.3.3()Z;		// selectingApplet()Z
-		// 15
 		staticMethodRef 0.7.1(S)V;		// javacard/framework/ISOException.throwIt(S)V
-		// 16
-		staticMethodRef AesApplet/doAES(Ljavacard/framework/APDU;)V;
+		// 15
+		staticMethodRef AesApplet/doAES(Ljavacard/framework/APDU;B)V;
 			.descriptor	Ljavacard/framework/APDU;	0.10;
 
-		// 17
+		// 16
 		virtualMethodRef 0.10.6()S;		// setIncomingAndReceive()S
-		// 18
+		// 17
 		virtualMethodRef 2.1.3(Ljavacard/security/Key;B)V;		// init(Ljavacard/security/Key;B)V
 			.descriptor	Ljavacard/security/Key;	1.0;
 
-		// 19
+		// 18
 		virtualMethodRef 2.1.1([BSS[BS)S;		// doFinal([BSS[BS)S
-		// 20
+		// 19
 		virtualMethodRef 0.10.7()S;		// setOutgoing()S
-		// 21
+		// 20
 		virtualMethodRef 0.10.9(S)V;		// setOutgoingLength(S)V
-		// 22
+		// 21
 		virtualMethodRef 0.10.5([BSS)V;		// sendBytesLong([BSS)V
 	}
 
 	.class public AesApplet 0 extends 0.3 {		// extends javacard/framework/Applet
 
 		.fields {
-			 1.20 aesKey 0;		// Ljavacard/security/AESKey;
-			 2.1 aesCipher 1;		// Ljavacardx/crypto/Cipher;
-			 1.14 random 2;		// Ljavacard/security/RandomData;
-			final short dataOffset 3;		// S
-			static byte[] a;		// [B
+			private 1.20 aesKey 0;		// Ljavacard/security/AESKey;
+			private 2.1 aesCipher 1;		// Ljavacardx/crypto/Cipher;
+			private byte[] acc 2;		// [B
+			private short dataOffset 3;		// S
 		}
 
 		.publicMethodTable 7 {
@@ -102,34 +99,7 @@
 			.locals 0;
 
 				L0:	aload_0;
-					invokespecial 4;		// javacard/framework/Applet.<init>()V
-					aload_0;
-					sconst_5;
-					putfield_s 0;		// short JavaCardServer/AesApplet.dataOffset
-					aload_0;
-					bspush 15;
-					sspush 128;
-					sconst_0;
-					invokestatic 6;		// javacard/security/KeyBuilder.buildKey(BSZ)Ljavacard/security/Key;
-					checkcast 0 8;		// T_CLASSORINTERFACE javacard/security/AESKey
-					putfield_a 1;		// reference JavaCardServer/AesApplet.aesKey
-					aload_0;
-					bspush 13;
-					sconst_0;
-					invokestatic 5;		// javacardx/crypto/Cipher.getInstance(BZ)Ljavacardx/crypto/Cipher;
-					putfield_a 2;		// reference JavaCardServer/AesApplet.aesCipher
-					sspush 128;
-					newarray 11;
-					putstatic_a 7;		// reference JavaCardServer/AesApplet.a
-					getfield_a_this 3;		// reference JavaCardServer/AesApplet.random
-					getstatic_a 7;		// reference JavaCardServer/AesApplet.a
-					sconst_0;
-					sspush 128;
-					invokevirtual 9;		// generateData([BSS)V
-					getfield_a_this 1;		// reference JavaCardServer/AesApplet.aesKey
-					getstatic_a 7;		// reference JavaCardServer/AesApplet.a
-					sconst_0;
-					invokeinterface 3 8 4;		// javacard/security/AESKey
+					invokespecial 7;		// javacard/framework/Applet.<init>()V
 					aload_0;
 					aload_1;
 					sload_2;
@@ -146,105 +116,141 @@
 			.stack 4;
 			.locals 0;
 
-				L0:	new 11;		// JavaCardServer/AesApplet
+				L0:	new 12;		// JavaCardServer/AesApplet
 					aload_0;
 					sload_1;
 					sload_2;
-					invokespecial 12;		// JavaCardServer/AesApplet.<init>([BSB)V
+					invokespecial 13;		// JavaCardServer/AesApplet.<init>([BSB)V
 					return;
 		}
 
 		.method public process(Ljavacard/framework/APDU;)V 7 {
-			.stack 2;
-			.locals 1;
-
-			.descriptor	Ljavacard/framework/APDU;	0.10;
-
-				L0:	aload_1;
-					invokevirtual 13;		// getBuffer()[B
-					astore_2;
-					aload_0;
-					invokevirtual 14;		// selectingApplet()Z
-					ifeq L2;
-				L1:	return;
-				L2:	aload_2;
-					sconst_0;
-					baload;
-					ifeq L4;
-				L3:	sspush 28160;
-					invokestatic 15;		// javacard/framework/ISOException.throwIt(S)V
-				L4:	aload_2;
-					sconst_1;
-					baload;
-					bspush -86;
-					if_scmpeq L6;
-				L5:	sspush 27904;
-					invokestatic 15;		// javacard/framework/ISOException.throwIt(S)V
-				L6:	aload_2;
-					sconst_2;
-					baload;
-					stableswitch L8 1 1 L7;
-				L7:	aload_0;
-					aload_1;
-					invokespecial 16;		// JavaCardServer/AesApplet.doAES(Ljavacard/framework/APDU;)V
-					return;
-				L8:	sspush 27392;
-					invokestatic 15;		// javacard/framework/ISOException.throwIt(S)V
-					return;
-		}
-
-		.method private doAES(Ljavacard/framework/APDU;)V {
-			.stack 6;
+			.stack 5;
 			.locals 2;
 
 			.descriptor	Ljavacard/framework/APDU;	0.10;
 
 				L0:	aload_1;
-					invokevirtual 13;		// getBuffer()[B
+					invokevirtual 4;		// getBuffer()[B
 					astore_2;
+					aload_0;
+					invokevirtual 5;		// selectingApplet()Z
+					ifeq L2;
+				L1:	return;
+				L2:	aload_0;
 					aload_1;
-					invokevirtual 17;		// setIncomingAndReceive()S
+					invokevirtual 6;		// getOffsetCdata()S
+					putfield_s 0;		// short JavaCardServer/AesApplet.dataOffset
+					aload_0;
+					bspush 15;
+					sspush 128;
+					sconst_0;
+					invokestatic 8;		// javacard/security/KeyBuilder.buildKey(BSZ)Ljavacard/security/Key;
+					checkcast 0 9;		// T_CLASSORINTERFACE javacard/security/AESKey
+					putfield_a 1;		// reference JavaCardServer/AesApplet.aesKey
+					aload_0;
+					bspush 13;
+					sconst_0;
+					invokestatic 11;		// javacardx/crypto/Cipher.getInstance(BZ)Ljavacardx/crypto/Cipher;
+					putfield_a 2;		// reference JavaCardServer/AesApplet.aesCipher
+					aload_0;
+					bspush 16;
+					newarray 11;
+					putfield_a 3;		// reference JavaCardServer/AesApplet.acc
+					sconst_0;
 					sstore_3;
+					goto L4;
+				L3:	getfield_a_this 3;		// reference JavaCardServer/AesApplet.acc
 					sload_3;
-					bspush 24;
-					if_scmpeq L2;
-				L1:	sspush 26368;
-					invokestatic 15;		// javacard/framework/ISOException.throwIt(S)V
-				L2:	getfield_a_this 2;		// reference JavaCardServer/AesApplet.aesCipher
-					getfield_a_this 1;		// reference JavaCardServer/AesApplet.aesKey
-					sconst_2;
-					invokevirtual 18;		// init(Ljavacard/security/Key;B)V
-					getfield_a_this 2;		// reference JavaCardServer/AesApplet.aesCipher
 					aload_2;
-					sconst_5;
 					sload_3;
-					getstatic_a 7;		// reference JavaCardServer/AesApplet.a
-					bspush 29;
-					invokevirtual 19;		// doFinal([BSS[BS)S
-					pop;
-					getfield_a_this 2;		// reference JavaCardServer/AesApplet.aesCipher
-					getfield_a_this 1;		// reference JavaCardServer/AesApplet.aesKey
+					getfield_s_this 0;		// short JavaCardServer/AesApplet.dataOffset
+					sadd;
+					baload;
+					bastore;
+					sinc 3 1;
+				L4:	sload_3;
+					bspush 16;
+					if_scmplt L3;
+				L5:	getfield_a_this 1;		// reference JavaCardServer/AesApplet.aesKey
+					getfield_a_this 3;		// reference JavaCardServer/AesApplet.acc
+					sconst_0;
+					invokeinterface 3 9 4;		// javacard/security/AESKey
+					aload_2;
+					sconst_0;
+					baload;
+					ifeq L7;
+				L6:	sspush 28160;
+					invokestatic 14;		// javacard/framework/ISOException.throwIt(S)V
+				L7:	aload_2;
 					sconst_1;
-					invokevirtual 18;		// init(Ljavacard/security/Key;B)V
+					baload;
+					bspush -86;
+					if_scmpeq L9;
+				L8:	sspush 27904;
+					invokestatic 14;		// javacard/framework/ISOException.throwIt(S)V
+				L9:	aload_2;
+					sconst_2;
+					baload;
+					stableswitch L12 1 2 L10 L11;
+				L10:	aload_0;
+					aload_1;
+					sconst_2;
+					invokespecial 15;		// JavaCardServer/AesApplet.doAES(Ljavacard/framework/APDU;B)V
+					sspush 27392;
+					invokestatic 14;		// javacard/framework/ISOException.throwIt(S)V
+					return;
+				L11:	sspush 27392;
+					invokestatic 14;		// javacard/framework/ISOException.throwIt(S)V
+					aload_0;
+					aload_1;
+					sconst_1;
+					invokespecial 15;		// JavaCardServer/AesApplet.doAES(Ljavacard/framework/APDU;B)V
+					return;
+				L12:	sspush 27392;
+					invokestatic 14;		// javacard/framework/ISOException.throwIt(S)V
+					return;
+		}
+
+		.method private doAES(Ljavacard/framework/APDU;B)V {
+			.stack 7;
+			.locals 2;
+
+			.descriptor	Ljavacard/framework/APDU;	0.10;
+
+				L0:	aload_1;
+					invokevirtual 4;		// getBuffer()[B
+					astore_3;
+					aload_1;
+					invokevirtual 16;		// setIncomingAndReceive()S
+					sstore 4;
 					getfield_a_this 2;		// reference JavaCardServer/AesApplet.aesCipher
-					aload_2;
-					bspush 29;
-					sload_3;
-					getstatic_a 7;		// reference JavaCardServer/AesApplet.a
-					bspush 53;
-					invokevirtual 19;		// doFinal([BSS[BS)S
+					getfield_a_this 1;		// reference JavaCardServer/AesApplet.aesKey
+					sload_2;
+					invokevirtual 17;		// init(Ljavacard/security/Key;B)V
+					getfield_a_this 2;		// reference JavaCardServer/AesApplet.aesCipher
+					aload_3;
+					getfield_s_this 0;		// short JavaCardServer/AesApplet.dataOffset
+					sload 4;
+					getfield_a_this 3;		// reference JavaCardServer/AesApplet.acc
+					getfield_s_this 0;		// short JavaCardServer/AesApplet.dataOffset
+					sload 4;
+					sadd;
+					invokevirtual 18;		// doFinal([BSS[BS)S
 					pop;
 					aload_1;
-					invokevirtual 20;		// setOutgoing()S
+					invokevirtual 19;		// setOutgoing()S
 					pop;
 					aload_1;
-					bspush 72;
-					invokevirtual 21;		// setOutgoingLength(S)V
+					aload_3;
+					arraylength;
+					invokevirtual 20;		// setOutgoingLength(S)V
 					aload_1;
-					aload_2;
-					sconst_5;
-					bspush 72;
-					invokevirtual 22;		// sendBytesLong([BSS)V
+					aload_3;
+					getfield_s_this 0;		// short JavaCardServer/AesApplet.dataOffset
+					aload_3;
+					arraylength;
+					invokevirtual 21;		// sendBytesLong([BSS)V
 					return;
 		}
 

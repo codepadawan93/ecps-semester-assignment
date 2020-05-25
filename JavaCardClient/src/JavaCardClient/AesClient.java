@@ -24,11 +24,13 @@ public class AesClient {
     
 	private void send(byte[] arr) throws IOException {
         out.write(arr, 0, arr.length);
+        LogUtils.log("AesClient.send", LogUtils.byteArrayToHexStr(arr));
 	};
 	
 	public byte[] receive(int len) throws IOException {
 		byte buffer[] = new byte[len];
 		in.read(buffer);
+		LogUtils.log("AesClient.receive", LogUtils.byteArrayToHexStr(buffer));
 		return buffer;
 	};
 	
@@ -56,16 +58,28 @@ public class AesClient {
 	}
 	
 	public int sendFile(String path) throws IOException {
+		// TODO:: make this work properly
 		byte[] contents = FileUtils.getFileContents(path);
-		byte[] prefix = {(byte)0x80, 0x00, 0x15, 0x00, 0x00, 0x11};
+		byte[] prefix = {
+				0x00, // CLA
+				(byte)0xAA, // INS
+				0x01, 0x00, // P1/P2
+				(byte)contents.length // Le
+		};
 		byte[] postfix = {(byte)0xc4, (byte)0x95};
 		byte[] apdu = new byte[prefix.length + contents.length  + postfix.length];
 		// Concatenate to obtain the apdu
-		for(int i = 0; i < apdu.length; i++){			
-			// TODO:: concatenate the three
+		for(int i = 0; i < prefix.length; i++){
+			apdu[i] = prefix[i];
 		}
-		// TODO:: send apdu
-		return contents.length;
+		for(int i = 0; i < contents.length; i++){
+			apdu[i + prefix.length] = contents[i];
+		}
+		for(int i = 0; i < postfix.length; i++){
+			apdu[i + prefix.length + contents.length] = postfix[i];
+		}
+		send(apdu);
+		return apdu.length;
 	}
 	
 	public void cleanup(){
@@ -74,7 +88,7 @@ public class AesClient {
 			if(this.out != null) out.close();
             if(this.in != null) in.close();
 		} catch(Exception e){
-			LogUtils.log("AesClient - cleanup", e.getStackTrace().toString());
+			LogUtils.log("AesClient.cleanup", e.getStackTrace().toString());
 		}
 	}
 }

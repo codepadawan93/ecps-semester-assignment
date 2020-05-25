@@ -14,20 +14,18 @@ public class AesMain {
 			client.sendPowerUp();
 			client.sendSelectAesApplet();
 			byte[] res = client.receive(10);
-			LogUtils.log("AesMain - res=", LogUtils.byteArrayToHexStr(res));
 			int len = client.sendFile("./TestData/testfile.txt");
-			res = client.receive(len);
-			LogUtils.log("AesMain - res=", LogUtils.byteArrayToHexStr(res));
+			// res = client.receive(len);
 			client.sendPowerDown();
 		} catch(UnknownHostException uhe){
 			uhe.printStackTrace();
-			LogUtils.log("AesMain - UnknownHostException", uhe.getMessage());
+			LogUtils.log("AesMain.main", uhe.getMessage());
 		} catch(IOException ioe){
 			ioe.printStackTrace();
-			LogUtils.log("AesMain - IOException", ioe.getMessage());
+			LogUtils.log("AesMain.main", ioe.getMessage());
 		} catch(Exception e){
 			e.printStackTrace();
-			LogUtils.log("AesMain - Exception", e.getMessage());
+			LogUtils.log("AesMain.main", e.getMessage());
 		} finally {
 			client.cleanup();
 		}

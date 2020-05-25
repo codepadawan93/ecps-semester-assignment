@@ -44,33 +44,28 @@ public class AesApplet extends Applet {
          }
          
          switch (buf[ISO7816.OFFSET_P1]){
+         	 // Encrypt or decrypt the message
 	         case (byte) 0x01:
-	              doAES(apdu);
+	              doAES(apdu, Cipher.MODE_ENCRYPT);
+	              return;
+	         case (byte) 0x02:
+	              doAES(apdu, Cipher.MODE_DECRYPT);
 	              return;
 	         default:
 	              ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
          }
     }
 
-    private void doAES(APDU apdu){
-         
+    private void doAES(APDU apdu, byte mode){
+    	// TODO:: debug this
          byte buffer[] = apdu.getBuffer();
-         
          short incomingLength = (short) (apdu.setIncomingAndReceive());
-         if (incomingLength != 24) {
-        	 ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
-         }
-
-         //perform encryption and append results in APDU Buffer a[] automatically 
          
-         aesCipher.init(aesKey, Cipher.MODE_ENCRYPT);
-         aesCipher.doFinal(buffer, (short) dataOffset, incomingLength, a, (short) (dataOffset + 24));
-         aesCipher.init(aesKey, Cipher.MODE_DECRYPT);
-         aesCipher.doFinal(buffer, (short) (dataOffset + 24), incomingLength, a, (short) (dataOffset + 48));
-
-         // Send results
+    	 aesCipher.init(aesKey, mode);
+    	 aesCipher.doFinal(buffer, (short) dataOffset, incomingLength, a, (short) (dataOffset + incomingLength));
+         
          apdu.setOutgoing();
-         apdu.setOutgoingLength((short) 72);
-         apdu.sendBytesLong(buffer, (short) dataOffset, (short) 72);
+         apdu.setOutgoingLength((short) buffer.length);
+         apdu.sendBytesLong(buffer, (short) dataOffset, (short)buffer.length);
     }
 }

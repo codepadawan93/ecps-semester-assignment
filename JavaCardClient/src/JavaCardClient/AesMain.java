@@ -14,18 +14,20 @@ public class AesMain {
 			client.sendPowerUp();
 			client.sendSelectAesApplet();
 			byte[] res = client.receive(10);
-			LogUtils.log("AesMain", LogUtils.byteArrayToHexStr(res));
-			// TODO :: Perform encryption
+			LogUtils.log("AesMain - res=", LogUtils.byteArrayToHexStr(res));
+			int len = client.sendFile("./TestData/testfile.txt");
+			res = client.receive(len);
+			LogUtils.log("AesMain - res=", LogUtils.byteArrayToHexStr(res));
 			client.sendPowerDown();
 		} catch(UnknownHostException uhe){
 			uhe.printStackTrace();
-			LogUtils.log("AesMain", uhe.getMessage());
+			LogUtils.log("AesMain - UnknownHostException", uhe.getMessage());
 		} catch(IOException ioe){
 			ioe.printStackTrace();
-			LogUtils.log("AesMain", ioe.getMessage());
+			LogUtils.log("AesMain - IOException", ioe.getMessage());
 		} catch(Exception e){
 			e.printStackTrace();
-			LogUtils.log("AesMain", e.getMessage());
+			LogUtils.log("AesMain - Exception", e.getMessage());
 		} finally {
 			client.cleanup();
 		}

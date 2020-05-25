@@ -2,11 +2,9 @@ package JavaCardClient;
 
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 
 public class AesClient {
 	
@@ -48,12 +46,26 @@ public class AesClient {
 		send(new byte[]{0x00, (byte)0xa4, 0x04, 0x00, 0x09, (byte)0xa0, 0x00, 0x00, 0x00, 0x62, 0x03, 0x01, 0x08, 0x01, 0x7f});
 		// create applet
 		send(new byte[]{(byte)0x80, (byte)0xb8, 0x00, 0x00, 0xd, 0xb, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x00, 0x00, 0x00, 0x7f});
-	}	
+	}
+	
 	public void sendSelectAesApplet() throws IOException {
 		// select applet
 		send(new byte[]{(byte)0x80, 0x00, 0x15, 0x00, 0x00, 0x11, // prefix
 				0x00, (byte)0xA4, 0x04, 0x00, 0xb, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x00, 0x00, 0x7F, // actual instruction
 				(byte)0xc4, (byte)0x95}); // postfix
+	}
+	
+	public int sendFile(String path) throws IOException {
+		byte[] contents = FileUtils.getFileContents(path);
+		byte[] prefix = {(byte)0x80, 0x00, 0x15, 0x00, 0x00, 0x11};
+		byte[] postfix = {(byte)0xc4, (byte)0x95};
+		byte[] apdu = new byte[prefix.length + contents.length  + postfix.length];
+		// Concatenate to obtain the apdu
+		for(int i = 0; i < apdu.length; i++){			
+			// TODO:: concatenate the three
+		}
+		// TODO:: send apdu
+		return contents.length;
 	}
 	
 	public void cleanup(){
@@ -62,7 +74,7 @@ public class AesClient {
 			if(this.out != null) out.close();
             if(this.in != null) in.close();
 		} catch(Exception e){
-			LogUtils.log("AesClient", e.getStackTrace().toString());
+			LogUtils.log("AesClient - cleanup", e.getStackTrace().toString());
 		}
 	}
 }

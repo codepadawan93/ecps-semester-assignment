@@ -2,6 +2,7 @@ package JavaCardClient;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class FileUtils {
@@ -13,4 +14,11 @@ public class FileUtils {
     	fis.close();
     	return bytesArray;
     }
+	
+	public static void writeToFile(String path, byte[] contents) throws IOException {
+		File file = new File(path);
+		FileOutputStream fos = new FileOutputStream(file);
+		fos.write(contents);
+		fos.close();
+	}
 }

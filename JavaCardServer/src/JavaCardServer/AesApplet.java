@@ -32,10 +32,10 @@ public class AesApplet extends Applet {
 	    dataOffset = apdu.getOffsetCdata();
     	aesKey = (AESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_AES, KeyBuilder.LENGTH_AES_128, false);
         aesCipher = Cipher.getInstance(Cipher.ALG_AES_BLOCK_128_CBC_NOPAD, false);
-        acc = new byte[16];
-        for(short i = 0; i < 16; i++){
-        	acc[i] = buf[(short)(i + dataOffset)];
-        }
+        acc = new byte[]{
+				0x74, 0x65, 0x73, 0x74, 0x70, 0x61, 0x73, 0x73,
+				0x77, 0x6f, 0x72, 0x64, 0x31, 0x32, 0x33, 0x34 // testpassword1234
+		};
         aesKey.setKey(acc, (short) 0);
 	    if (buf[ISO7816.OFFSET_CLA] != 0x00) {
 	    	ISOException.throwIt(ISO7816.SW_CLA_NOT_SUPPORTED);

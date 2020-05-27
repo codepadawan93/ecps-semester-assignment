@@ -13,9 +13,10 @@ public class AesMain {
 			// TODO:: Also read the response. For some reason it crashes
 			client = new AesClient("127.0.0.1", 9025);
 			client.sendPowerUp();
-			client.sendSelectAesApplet();
 			client.sendInstall();
-			int len = client.sendFile("./TestData/testfile.txt");
+			client.sendSelectAesApplet();
+			byte[] encryptedFile = client.sendFileInChunks("./TestData/testfile.txt", ClientAction.ENCRYPT);
+			FileUtils.writeToFile("./Output/outfile.enc", encryptedFile);
 			client.sendPowerDown();
 		} catch(UnknownHostException uhe){
 			uhe.printStackTrace();

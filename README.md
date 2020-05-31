@@ -4,7 +4,7 @@
 
 Create a Java Card applet using JavaCard 3.1.0+ API for the following requirements (maximum 10 out of 10):
 
-- [ ] Encrypt and Decrypt a file (PDF, Word or another format) with AES algorithm.
+- [x] Encrypt and Decrypt a file (PDF, Word or another format) with AES algorithm (works partially - see below)
 - [x] The Java Card application exchanges message and is selected by a host stand-alone application (C/C++/Java), or a browser plugin.
 - [x] The source code for the Java card applet and for the host application must be provided.
 - [x] Also the files with the compilation phases and the test statements in batch must be provided.
@@ -25,10 +25,13 @@ Create a Java Card applet using JavaCard 3.1.0+ API for the following requiremen
 7. Happy coding!
 
 ## How to run
-TODO
+Open the directory with eclipse, should pick up the projects
 
 ## Project Structure
-TODO
+There are 2 projects, the client and the applet. Run the applet in the emulator then run the client in parallel. The encrypted file will be in Output/outfile.enc
+
+## Caveats
+Currently it only works for the first APDU sent due to some netcode issues. I could not configure the APIs to work on the client side so I attempted to reverse-engineer the protocol on the raw TCP level with limited success. I got the APDU part right but there is an additional TCP envelope of 6 bytes at the beginning and 2 bytes at the end that I did not fully understand and I could not replicate or find documentation on. Therefore I was unable to fully implement the client functionality. However please note that there are some custom scripts included in the Applet project, such as ```encryptionTest.script``` that demonstrate the Applet works correctly. 
 
 ## APDU structure
 <table class="wikitable">

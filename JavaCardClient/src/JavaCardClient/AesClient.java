@@ -8,6 +8,13 @@ import java.io.OutputStream;
 
 public class AesClient {
 	
+	private static final int PREFIX_LEN = 6;
+	private static final int CLA = PREFIX_LEN + 0;
+	private static final int INS = PREFIX_LEN + 1;
+	private static final int P1 = PREFIX_LEN + 2;
+	private static final int P2 = PREFIX_LEN + 3;
+	private static final int AES_LEN_BYTES = 16;
+	
 	private Socket socket;
 	private OutputStream out;
 	private InputStream in;
@@ -18,6 +25,7 @@ public class AesClient {
     	this.host = host;
     	this.port = port;
     	this.socket = new Socket(this.host, this.port);
+    	this.socket.setTcpNoDelay(true);
     	out = socket.getOutputStream();
     	in = socket.getInputStream();
     }
@@ -42,12 +50,6 @@ public class AesClient {
 		return apdu;
 	}
 	
-	private void updateBuffer(byte[] to, byte[] from, int indexTo, int indexFrom){
-		for(int i = indexTo, j = indexFrom; i < to.length && j < from.length; i++, j++){
-			to[i] = from[j];
-		}
-	}
-	
 	public byte[] receive(int len) throws IOException {
 		byte buffer[] = new byte[len];
 		int read = in.read(buffer);
@@ -62,6 +64,7 @@ public class AesClient {
 	public void sendPowerUp() throws IOException {
 		LogUtils.log("AesClient.sendPowerUp", "powering up");
 		send(new byte[]{(byte)0xf0, 0x00, 0x00, (byte)0xf0});
+		receive(10);
 	}
 	
 	public void sendPowerDown() throws IOException {
@@ -72,9 +75,19 @@ public class AesClient {
 	public void sendInstall()throws IOException {
 		LogUtils.log("AesClient.sendInstall", "installing");
 		// install
-		send(new byte[]{0x00, (byte)0xa4, 0x04, 0x00, 0x09, (byte)0xa0, 0x00, 0x00, 0x00, 0x62, 0x03, 0x01, 0x08, 0x01, 0x7f});
+		send(new byte[]{
+				(byte)0x80, 0x00, 0x13, 0x00, 0x00, 0x0f, // prefix
+				0x00, (byte)0xa4, 0x04, 0x00, 0x09, (byte)0xa0, 0x00, 0x00, 0x00, 0x62, 0x03, 0x01, 0x08, 0x01, 0x7f,
+				0x10, (byte)0x93 //postfix 
+				});
+		receive(10);
 		// create applet
-		send(new byte[]{(byte)0x80, (byte)0xb8, 0x00, 0x00, 0xd, 0xb, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x00, 0x00, 0x00, 0x7f});
+		send(new byte[]{ 
+				(byte)0x80, 0x00, 0x17, 0x00, 0x40, 0x13, // prefix
+				(byte)0x80, (byte)0xb8, 0x00, 0x00, 0xd, 0xb, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x00, 0x00, 0x00, 0x7f,
+				0x13, (byte)0x97 // postfix
+				});
+		receive(10);
 	}
 	
 	public void sendSelectAesApplet() throws IOException {
@@ -83,13 +96,14 @@ public class AesClient {
 		send(new byte[]{(byte)0x80, 0x00, 0x15, 0x00, 0x00, 0x11, // prefix
 				0x00, (byte)0xA4, 0x04, 0x00, 0xb, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x00, 0x00, 0x7F, // data
 				(byte)0xc4, (byte)0x95}); // postfix
+		receive(21);
 	}
 	
 	public byte[] sendFileInChunks(String path, ClientAction action) throws IOException {
 		LogUtils.log("AesClient.sendFile", "sending file");
 		// TODO:: make this work properly
 		byte[] contents = FileUtils.getFileContents(path);
-		int paddingNeeded = contents.length % 16;
+		int paddingNeeded = contents.length % AES_LEN_BYTES;
 		byte[] paddedContents = new byte[contents.length + paddingNeeded];
 		// PKCS 7 padding
 		for(int i = 0; i < paddedContents.length; i++){
@@ -100,47 +114,48 @@ public class AesClient {
 			}
 		}
 		byte[] response = new byte[paddedContents.length];
-		// P1 0x01 - encrypt begin
-		// P1 0x02 - decrypt begin
-		// P1 0x03 - update
-		// P1 0x04 - finalize
+		// P1 - 0x00 = encrypt, 0x01 = decrypt
+    	// P2 - 0x00 = does not have more, 0x01 = has more
 		byte[] prefix = {
-				(byte)0x80, 0x00, 0x1d, 0x00, 0x00, 0x19, // Not sure why this envelope is needed
+				(byte)0x80, 0x00, 0x19, 0x00, 0x40, 0x15,
 				0x00, // CLA
 				(byte)0xaa, // INS
 				0x00, // P1 
 				0x00, // P2
-				(byte)16 // Le
+				(byte)AES_LEN_BYTES // Le
 		};
-		byte[] postfix = { (byte)0xbc, (byte)0x9d };
+		byte[] postfix = { (byte)0xef, (byte)0x99 };
 		
+		// Tell it what we want to do
 		if(action == ClientAction.ENCRYPT){
-			prefix[8] = 0x01;
+			prefix[P1] = 0x00;
 		} else {
-			prefix[8] = 0x02;
+			prefix[P1] = 0x01;
+		}
+		
+		// Figure out if we have more than one chunk to send
+		if(paddedContents.length / AES_LEN_BYTES > 1){
+			prefix[P2] = 0x01;
 		}
 		
 		// Send file in 16 byte chunks
-		byte[] apdu;
-		for(int i = 0; i < paddedContents.length; i+=16){
-			if(i == 0){
-				apdu = makeApdu(prefix, paddedContents, postfix);
-				// send first 16 bytes and tell it we want to encrypt
-				send(apdu);
-				updateBuffer(response, receive(16), i, 0);
-			} else {
-				// set P1 to update
-				prefix[8] = 0x03;
-				apdu = makeApdu(prefix, paddedContents, postfix);
-				send(apdu);
-				updateBuffer(response, receive(16), i, 0);
+		for(int i = 0, j = 0; i < paddedContents.length; i += AES_LEN_BYTES, j++){
+			byte[] apdu;
+			byte[] contentSubArray = new byte[AES_LEN_BYTES];
+			// If we are at last chunk we stop
+			if(i == paddedContents.length - AES_LEN_BYTES){
+				prefix[P2] = 0x00;
+			}
+			System.arraycopy(paddedContents, i, contentSubArray, 0, AES_LEN_BYTES);
+			apdu = makeApdu(prefix, contentSubArray, postfix);
+			LogUtils.log("AesClient.sendFileInChunks", LogUtils.byteArrayToHexStr(contentSubArray));
+			send(apdu);
+			receive(10);
+			byte[] temp = receive(22);
+			if(temp.length > 1){				
+				System.arraycopy(temp, PREFIX_LEN, response, i, AES_LEN_BYTES);
 			}
 		}
-		// finalize - just send the signal, no response required
-		prefix[8] = 0x04;
-		prefix[10] = 0x00;
-		apdu = makeApdu(prefix, new byte[]{}, new byte[]{});
-		send(apdu);
 		return response;
 	}
 	
